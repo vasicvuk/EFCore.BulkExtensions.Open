@@ -219,7 +219,8 @@ public class EFCoreBulkTest : IAssemblyFixture<DbAssemblyFixture>
         //var suffix = " Concatenated";
         //query.BatchUpdate(a => new Item { Name = a.Name + suffix, Quantity = a.Quantity + incrementStep }); // example of BatchUpdate Increment/Decrement value in variable
     }
-    
+
+#if !V10
     [Theory]
     [InlineData(DbServerType.MySQL)]
     public void InsertTestMySQL(DbServerType dbServer)
@@ -312,13 +313,19 @@ public class EFCoreBulkTest : IAssemblyFixture<DbAssemblyFixture>
         entities5.Add(new Item { ItemId = 16, Name = "Name 16", Description = "info 16" }); // when BulkSaveChanges with Upsert 'ItemId' has to be set(EX.My1), and with Insert only it skips one number, Id becomes 17 instead of 16
         context.AddRange(entities5);
         context.BulkSaveChanges();
+
+#if V10 || V9
+        Assert.Equal(18, entities5[1].ItemId);
+#else
         Assert.Equal(16, entities5[1].ItemId);
+#endif
         Assert.Equal("info 16", context.Items.Where(a => a.Name == "Name 16").AsNoTracking().FirstOrDefault()?.Description);
 
         //EX.My1: "The property 'Item.ItemId' has a temporary value while attempting to change the entity's state to 'Unchanged'.
         //         Either set a permanent value explicitly, or ensure that the database is configured to generate values for this property."
     }
-    
+
+#endif
     [Theory]
     [InlineData(DbServerType.SQLServer, true)]
     [InlineData(DbServerType.SQLite, true)]

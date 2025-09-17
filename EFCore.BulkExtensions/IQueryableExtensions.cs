@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -30,7 +30,8 @@ public static class IQueryableExtensions
         string cannotGetText = "Cannot get";
 
         var enumerator = query.Provider.Execute<IEnumerable>(query.Expression).GetEnumerator();
-        var queryContext = enumerator.Private<RelationalQueryContext>(relationalQueryContextText) ?? throw new InvalidOperationException($"{cannotGetText} {relationalQueryContextText}");
+        var queryContext = enumerator.Private<RelationalQueryContext>(relationalQueryContextText)
+                          ?? throw new InvalidOperationException($"{cannotGetText} {relationalQueryContextText}");
 #if NET10_0_OR_GREATER
         // EF Core 10: access via reflection to avoid compile-time dependency on removed API
         var parameterValues = queryContext.Parameters;
@@ -39,7 +40,7 @@ public static class IQueryableExtensions
 #endif
 
 #pragma warning disable EF1001 // Internal EF Core API usage.
-                var relationalCommandCache = (RelationalCommandCache?)enumerator.Private(relationalCommandCacheText);
+        var relationalCommandCache = (RelationalCommandCache?)enumerator.Private(relationalCommandCacheText);
 #pragma warning restore EF1001
 
         IRelationalCommand command;
@@ -52,11 +53,30 @@ public static class IQueryableExtensions
         }
         else
         {
-            string selectExpressionText = "_selectExpression";
-            string querySqlGeneratorFactoryText = "_querySqlGeneratorFactory";
-            SelectExpression selectExpression = enumerator.Private<SelectExpression>(selectExpressionText) ?? throw new InvalidOperationException($"{cannotGetText} {selectExpressionText}");
-            IQuerySqlGeneratorFactory factory = enumerator.Private<IQuerySqlGeneratorFactory>(querySqlGeneratorFactoryText) ?? throw new InvalidOperationException($"{cannotGetText} {querySqlGeneratorFactoryText}");
-            command = factory.Create().GetCommand(selectExpression);
+            // Try EF Core 9/10 path via RelationalCommandResolver delegate present on SingleQueryingEnumerable enumerator
+            var resolverObj = enumerator.Private("_relationalCommandResolver") ?? enumerator.PrivateOfType<object>();
+            if (resolverObj is Delegate resolverDelegate)
+            {
+                var resolved = resolverDelegate.DynamicInvoke(parameterValues);
+                if (resolved is IRelationalCommand rc)
+                {
+                    command = rc;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Failed to resolve relational command via resolver.");
+                }
+            }
+            else
+            {
+                string selectExpressionText = "_selectExpression";
+                string querySqlGeneratorFactoryText = "_querySqlGeneratorFactory";
+                SelectExpression selectExpression = enumerator.Private<SelectExpression>(selectExpressionText)
+                   ?? throw new InvalidOperationException($"{cannotGetText} {selectExpressionText}");
+                IQuerySqlGeneratorFactory factory = enumerator.Private<IQuerySqlGeneratorFactory>(querySqlGeneratorFactoryText)
+                   ?? throw new InvalidOperationException($"{cannotGetText} {querySqlGeneratorFactoryText}");
+                command = factory.Create().GetCommand(selectExpression);
+            }
         }
         string sql = command.CommandText;
 
@@ -95,7 +115,46 @@ public static class IQueryableExtensions
 
     private static readonly BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic;
 
-    private static object? Private(this object obj, string privateField) => obj?.GetType().GetField(privateField, bindingFlags)?.GetValue(obj);
+    private static object? Private(this object obj, string privateField)
+    {
+        if (obj is null) return null;
+        var type = obj.GetType();
+        while (type != null)
+        {
+            var field = type.GetField(privateField, bindingFlags);
+            if (field != null)
+            {
+                return field.GetValue(obj);
+            }
+            type = type.BaseType;
+        }
+        return null;
+    }
 
-    private static T? Private<T>(this object obj, string privateField) => (T?)obj?.GetType().GetField(privateField, bindingFlags)?.GetValue(obj);
+    private static T? Private<T>(this object obj, string privateField)
+    {
+        var value = Private(obj, privateField);
+        return value is T t ? t : default;
+    }
+    
+    private static T? PrivateOfType<T>(this object obj)
+    {
+        if (obj is null) return default;
+        var type = obj.GetType();
+        while (type != null)
+        {
+            var field = type.GetFields(bindingFlags).FirstOrDefault(f => typeof(T).IsAssignableFrom(f.FieldType));
+            if (field != null)
+            {
+                var value = field.GetValue(obj);
+                return value is T t ? t : default;
+            }
+            type = type.BaseType;
+        }
+        return default;
+    }
+
 }
+
+
+

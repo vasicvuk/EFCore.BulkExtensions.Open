@@ -20,6 +20,7 @@ public class TruncatedDoubleValueTest : IClassFixture<TruncatedDoubleValueTest.D
     /// <summary>
     /// Covers issue: https://github.com/videokojot/EFCore.BulkExtensions.MIT/issues/85
     /// </summary>
+    #if !V10
     [Theory]
     [InlineData(DbServerType.MySQL)]
     public async Task CheckThatWeDoNotTruncateValue(DbServerType serverType)
@@ -51,6 +52,7 @@ public class TruncatedDoubleValueTest : IClassFixture<TruncatedDoubleValueTest.D
             // For now, the resolution is not to use SetOutputIdentity for MySql as it does not work anyway.
         });
     }
+#endif
 
     public class DatabaseFixture : BulkDbTestsFixture<GameDbContext>
     {

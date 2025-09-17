@@ -258,7 +258,7 @@ public static class ContextUtil
         {
             string connectionString = GetSqliteConnectionString(databaseName);
             optionsBuilder.UseSqlite(connectionString);
-            SQLitePCL.Batteries.Init();
+            SQLitePCL.Batteries_V2.Init();
 
             // ALTERNATIVELY:
             //string connectionString = (new SqliteConnectionStringBuilder { DataSource = $"{databaseName}Lite.db" }).ToString();
