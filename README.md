@@ -56,14 +56,6 @@ Package manager console command for installation: *Install-Package EfCore.BulkEx
 | 8.x   | net8.0          | EF Core 8.0    | net8.0+                |
 | 9.x   | net9.0          | EF Core 9.0    | net9.0+                |
 | 10.x  | net10.0 (RC)    | EF Core 10 (RC)| net10.0+ (RC)          |
-Its assembly is [Strong-Named](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/strong-naming) and [Signed](https://github.com/borisdj/EFCore.BulkExtensions/issues/161) with a key.
-| Nuget | Target          | Used EF v.  | For projects targeting          |
-| ----- | --------------- | ----------- | ------------------------------- |
-| 8.x   | Net 8.0         | EF Core 8.0 | Net 8.0+                        |
-| 7.x   | Net 6.0         | EF Core 7.0 | Net 7.0+                        |
-| 6.x   | Net 6.0         | EF Core 6.0 | Net 6.0+                        |
-| 5.x   | N/A             | N/A         | N/A                             |
-| 3.x   | N/A             | N/A         | N/A                             |
 
 Prior versions (5 and lower) are no longer actively maintained.
 
