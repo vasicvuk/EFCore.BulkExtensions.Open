@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\NugetProjects\EFCore.BulkExtensions.v10\EFCore.BulkExtensions.v10.csproj"/>
+    </ItemGroup>
+
+</Project>
