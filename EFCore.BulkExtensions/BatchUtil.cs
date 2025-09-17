@@ -308,8 +308,18 @@ public static class BatchUtil
                 bool updateColumnExplicit = updateColumns != null && updateColumns.Contains(propertyName);
                 if (isDifferentFromDefault || updateColumnExplicit)
                 {
-                    sql += $"[{columnName}] = @{columnName}, ";
-                    var parameterName = $"@{columnName}";
+                    // Generate a parameter name that does not collide (case-insensitively) with existing parameters
+                    string parameterName = $"@{columnName}";
+                    var existingNames = new HashSet<string>(parameters
+                        .OfType<System.Data.Common.DbParameter>()
+                        .Select(p => p.ParameterName), StringComparer.OrdinalIgnoreCase);
+                    int suffix = 0;
+                    while (existingNames.Contains(parameterName))
+                    {
+                        parameterName = $"@{columnName}_{suffix++}";
+                    }
+
+                    sql += $"[{columnName}] = {parameterName}, ";
                     IDbDataParameter? param = TryCreateRelationalMappingParameter(
                         columnName,
                         parameterName,
@@ -322,7 +332,7 @@ public static class BatchUtil
 
                         param = new SqlParameter
                         {
-                            ParameterName = $"@{columnName}",
+                            ParameterName = parameterName,
                             Value = propertyUpdateValue
                         };
                         if (!isDifferentFromDefault && propertyUpdateValue == DBNull.Value
