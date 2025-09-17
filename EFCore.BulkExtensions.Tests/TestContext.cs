@@ -139,7 +139,11 @@ public class TestContext : DbContext
             modelBuilder.Entity<Tracker>().OwnsOne(t => t.Location).Ignore(p => p.Location); // Point only on SqlServer
         }
 
+        #if V10
+        if (Database.IsSqlite() || Database.IsNpgsql())
+        #else
         if (Database.IsSqlite() || Database.IsNpgsql() || Database.IsMySql())
+        #endif
         {
             modelBuilder.Entity<Address>().Ignore(p => p.LocationGeography);
             modelBuilder.Entity<Address>().Ignore(p => p.LocationGeometry);
@@ -172,7 +176,11 @@ public class TestContext : DbContext
         modelBuilder.Entity<AtypicalRowVersionEntity>().Property(e => e.RowVersion).HasDefaultValue(0).IsConcurrencyToken().ValueGeneratedOnAddOrUpdate().Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Save);
         modelBuilder.Entity<AtypicalRowVersionEntity>().Property(e => e.SyncDevice).IsRequired(true).IsConcurrencyToken().HasDefaultValue("");
 
+        #if V10
+        if (!Database.IsNpgsql())
+        #else
         if (!Database.IsNpgsql() && !Database.IsMySql())
+        #endif
         {
             modelBuilder.Entity<AtypicalRowVersionConverterEntity>().Property(e => e.RowVersionConverted).HasConversion(new NumberToBytesConverter<long>()).HasColumnType("timestamp").IsRowVersion().IsConcurrencyToken();
         }
@@ -212,7 +220,9 @@ public static class ContextUtil
                 DbServerType.SQLServer => new SqlAdapters.SqlServer.SqlServerDbServer(),
                 DbServerType.SQLite => new SqlAdapters.SQLite.SqlLiteDbServer(),
                 DbServerType.PostgreSQL => new SqlAdapters.PostgreSql.PostgreSqlDbServer(),
+#if !V10
                 DbServerType.MySQL => new SqlAdapters.MySql.MySqlDbServer(),
+#endif
                 _ => throw new NotImplementedException(),
             };
         }
@@ -261,8 +271,12 @@ public static class ContextUtil
         }
         else if (dbServerType == DbServerType.MySQL)
         {
+#if !V10
             string connectionString = GetMySqlConnectionString(databaseName);
             optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+#else
+            throw new NotSupportedException("MySQL not supported in v10 tests (provider pending)");
+#endif
         }
         else
         {

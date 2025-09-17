@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EFCore.BulkExtensions.SqlAdapters.SQLite;
 using Microsoft.Data.SqlClient;
+using Xunit;
 
 namespace EFCore.BulkExtensions.Tests;
 
