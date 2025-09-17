@@ -31,7 +31,13 @@ public static class IQueryableExtensions
 
         var enumerator = query.Provider.Execute<IEnumerable>(query.Expression).GetEnumerator();
         var queryContext = enumerator.Private<RelationalQueryContext>(relationalQueryContextText) ?? throw new InvalidOperationException($"{cannotGetText} {relationalQueryContextText}");
+#if NET10_0_OR_GREATER
+        // EF Core 10: access via reflection to avoid compile-time dependency on removed API
+        var pvProp = queryContext.GetType().GetProperty("ParameterValues", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var parameterValues = (IReadOnlyDictionary<string, object?>?)pvProp?.GetValue(queryContext) ?? new Dictionary<string, object?>();
+#else
         var parameterValues = queryContext.ParameterValues;
+#endif
 
 #pragma warning disable EF1001 // Internal EF Core API usage.
         var relationalCommandCache = (RelationalCommandCache?)enumerator.Private(relationalCommandCacheText);
@@ -41,7 +47,13 @@ public static class IQueryableExtensions
         if (relationalCommandCache != null)
         {
 #pragma warning disable EF1001 // Internal EF Core API usage.
+#if NET10_0_OR_GREATER
+            var m = relationalCommandCache.GetType().GetMethod("GetRelationalCommandTemplate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            command = (IRelationalCommand)(m?.Invoke(relationalCommandCache, new object?[] { parameterValues! })
+                       ?? throw new InvalidOperationException("Failed to get relational command template."));
+#else
             command = (IRelationalCommand)relationalCommandCache.GetRelationalCommandTemplate(parameterValues);
+#endif
 #pragma warning restore EF1001
         }
         else

@@ -1,18 +1,18 @@
 <Project>
     <PropertyGroup>
-        <Title>EFCore.BulkExtensions.MIT</Title>
-        <BasePackageId>EFCore.BulkExtensions.MIT</BasePackageId>
+        <Title>EfCore.BulkExtensions.Open</Title>
+        <BasePackageId>EfCore.BulkExtensions.Open</BasePackageId>
         <PackageId>$(BasePackageId)</PackageId>
         <BaseVersion>19.0</BaseVersion>
         <!--        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
         <Nullable>enable</Nullable>
         <Authors>borisdj, Jindrich Cincibuch</Authors>
         <Description>EntityFramework EF Core Bulk Batch Extensions for Insert Update Delete Read (CRUD) operations on SQL Server, PostgreSQL, MySQL, SQLite</Description>
-        <PackageProjectUrl>https://github.com/videokojot/EFCore.BulkExtensions.MIT</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/vasicvuk/EfCore.BulkExtensions.Open</PackageProjectUrl>
         <PackageIcon>EFCoreBulk.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>EntityFrameworkCore Entity Framework Core EFCore EF Core SQL Server PostgreSQL MySQL SQLite Bulk Batch Extensions Insert Update Delete Read Truncate SaveChanges</PackageTags>
-        <RepositoryUrl>https://github.com/videokojot/EFCore.BulkExtensions.MIT</RepositoryUrl>
+        <RepositoryUrl>https://github.com/vasicvuk/EfCore.BulkExtensions.Open</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <!--        <SignAssembly>true</SignAssembly>-->
@@ -51,6 +51,24 @@
                 <DefineConstants>$(DefineConstants);V8</DefineConstants>
                 <AssemblyVersion>8.$(BaseVersion).0</AssemblyVersion>
                 <FileVersion>8.$(BaseVersion).0</FileVersion>
+            </PropertyGroup>
+        </When>
+        <When Condition="$(MSBuildProjectName.Contains('v9'))">
+            <PropertyGroup>
+                <Version>9.$(BaseVersion)</Version>
+                <TargetFramework>net9.0</TargetFramework>
+                <DefineConstants>$(DefineConstants);V9</DefineConstants>
+                <AssemblyVersion>9.$(BaseVersion).0</AssemblyVersion>
+                <FileVersion>9.$(BaseVersion).0</FileVersion>
+            </PropertyGroup>
+        </When>
+        <When Condition="$(MSBuildProjectName.Contains('v10'))">
+            <PropertyGroup>
+                <Version>10.$(BaseVersion)-rc</Version>
+                <TargetFramework>net10.0</TargetFramework>
+                <DefineConstants>$(DefineConstants);V10</DefineConstants>
+                <AssemblyVersion>10.$(BaseVersion).0</AssemblyVersion>
+                <FileVersion>10.$(BaseVersion).0</FileVersion>
             </PropertyGroup>
         </When>
         <Otherwise>
@@ -111,6 +129,12 @@
                 <Title>$(Title).SqlServer</Title>
                 <PackageId>$(BasePackageId).SqlServer</PackageId>
             </PropertyGroup>
+        </When>
+        <!-- Exclude MySql adapter from v10 base package until Pomelo 10 is available -->
+        <When Condition="$(MSBuildProjectName.Contains('v10')) and !$(MSBuildProjectName.Contains('MySql')) and !$(MSBuildProjectName.Contains('PostgreSql')) and !$(MSBuildProjectName.Contains('SQLite')) and !$(MSBuildProjectName.Contains('SqlServer'))">
+            <ItemGroup>
+                <Compile Remove="..\..\EFCore.BulkExtensions\SqlAdapters\MySql\**"/>
+            </ItemGroup>
         </When>
         <Otherwise>
         </Otherwise>

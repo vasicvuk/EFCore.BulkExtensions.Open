@@ -1,6 +1,8 @@
-# EFCore.BulkExtensions.MIT
+# EfCore.BulkExtensions.Open
 
-## This is MIT fork of [EFCore.BulkExtensions](https://github.com/borisdj/EFCore.BulkExtensions).
+Note: This repository is a renamed fork of videokojot/EFCore.BulkExtensions.MIT. It continues the MIT-licensed lineage with updated targets and package IDs.
+
+## This is MIT fork of [EFCore.BulkExtensions](https://github.com/borisdj/EFCore.BulkExtensions) via [videokojot/EFCore.BulkExtensions.MIT](https://github.com/videokojot/EFCore.BulkExtensions.MIT).
 ### Why?
 Original project changed it's license to dual license (commercial and free only under certain conditions). This fork is distributed under MIT license.
 ### When?
@@ -26,14 +28,14 @@ I forked the project at commit [5bf938a422](https://github.com/borisdj/EFCore.Bu
 - **Tests** are now run as part of release process (see GitHub Actions for yourself).
 - **Tests** are run against all versions, so no regressions should happen.
 
-# EFCore.BulkExtensions.MIT
+# EfCore.BulkExtensions.Open
 EntityFrameworkCore extensions: <br>
 -Bulk operations **(Insert, Update, Delete, Read, Upsert, Sync, SaveChanges)**<br>
 -Batch ops (**Delete, Update**) and **Truncate**.<br>
 Library is Lightweight and very Efficient, having all mostly used [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operation.<br>
 
 [//]: # (Was selected in top 20 [EF Core Extensions]&#40;https://docs.microsoft.com/en-us/ef/core/extensions/&#41; recommended by Microsoft.<br>)
-Latest version is using EF Core 8 and targeting .Net 8.<br>
+Latest versions support EF Core 8/9/10 and target .NET 8/9/10 (10 as RC).<br>
 Supports all 4 major databases:<br>
 -**SQLServer** (or SqlAzure) under the hood uses [SqlBulkCopy](https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqlbulkcopy.aspx) for Insert, Update/Delete = BulkInsert + raw Sql [MERGE](https://docs.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql).<br>
 -**PostgreSQL** (9.5+) is using [COPY BINARY](https://www.postgresql.org/docs/9.2/sql-copy.html) combined with [ON CONFLICT](https://www.postgresql.org/docs/10/sql-insert.html#SQL-ON-CONFLICT) for Update (supported from v6+).<br>
@@ -42,10 +44,10 @@ Supports all 4 major databases:<br>
 Bulk Tests can not have UseInMemoryDb because InMemoryProvider does not support Relational-specific methods.<br>
 Instead Test options are  SqlServer(Developer or Express), LocalDb([if alongside Developer v.](https://stackoverflow.com/questions/42885377/sql-server-2016-developer-version-can-not-connect-to-localdb-mssqllocaldb?noredirect=1&lq=1)), or for other adapters PostgreSQL/MySQL/SQLite.
 
-<!--[![Button](https://img.shields.io/nuget/v/EFCore.BulkExtensions.svg)](https://www.nuget.org/packages/EFCore.BulkExtensions.MIT/)-->
-Available on <a href="https://www.nuget.org/packages/EFCore.BulkExtensions.MIT/"><img src="https://buildstats.info/nuget/EFCore.BulkExtensions.MIT" /></a><br>
+<!--[![Button](https://img.shields.io/nuget/v/EfCore.BulkExtensions.Open.svg)](https://www.nuget.org/packages/EfCore.BulkExtensions.Open/)-->
+Available on <a href="https://www.nuget.org/packages/EfCore.BulkExtensions.Open/"><img src="https://buildstats.info/nuget/EfCore.BulkExtensions.Open" /></a><br>
 That is main nuget for all Databases, there are also specific ones with single provider for those who need small packages.<br>
-Package manager console command for installation: *Install-Package EFCore.BulkExtensions*<br>
+Package manager console command for installation: *Install-Package EfCore.BulkExtensions.Open*<br>
 Its assembly is [Strong-Named](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/strong-naming) and [Signed](https://github.com/borisdj/EFCore.BulkExtensions/issues/161) with a key.
 | Nuget | Target          | Used EF v.  | For projects targeting          |
 | ----- | --------------- | ----------- | ------------------------------- |

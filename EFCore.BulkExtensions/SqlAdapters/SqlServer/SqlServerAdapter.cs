@@ -856,7 +856,7 @@ public sealed class SqlOperationsServerAdapter: ISqlOperationsAdapter
                 {
                     using MemoryStream memStream = new();
                     using BinaryWriter binWriter = new(memStream);
-#if !NET8_0
+#if NET6_0 || NET7_0
                     hierarchyValue.Write(binWriter);
 #endif
                     propertyValue = memStream.ToArray();

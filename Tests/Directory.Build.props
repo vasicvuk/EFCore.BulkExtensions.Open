@@ -17,6 +17,14 @@
         <DefineConstants>$(DefineConstants);V8</DefineConstants>
     </PropertyGroup>
 
+    <PropertyGroup Condition="$(MSBuildProjectName.Contains('v9'))">
+        <DefineConstants>$(DefineConstants);V9</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(MSBuildProjectName.Contains('v10'))">
+        <DefineConstants>$(DefineConstants);V10</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="xunit.assemblyfixture" Version="2.2.0"/>
 
