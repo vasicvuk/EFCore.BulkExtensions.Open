@@ -64,7 +64,7 @@
         </When>
         <When Condition="$(MSBuildProjectName.Contains('v10'))">
             <PropertyGroup>
-                <Version>10.$(BaseVersion)-rc</Version>
+                <Version>10.$(BaseVersion)</Version>
                 <TargetFramework>net10.0</TargetFramework>
                 <DefineConstants>$(DefineConstants);V10</DefineConstants>
                 <AssemblyVersion>10.$(BaseVersion).0</AssemblyVersion>
